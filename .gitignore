@@ -1,0 +1,12 @@
+*~
+scratch
+gambit-source
+attic
+bin
+lib
+*.o
+*.o?
+*.so
+
+src/std/build-deps
+src/gerbil/runtime/gx-version.scm
