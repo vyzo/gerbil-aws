@@ -11,7 +11,7 @@ package: vyzo/aws
         :std/text/hex
         :std/net/uri
         :std/sort)
-(export aws4-canonical-request aws4-sign)
+(export aws4-canonical-request aws4-sign aws4-auth)
 
 ;; Reference: http://docs.aws.amazon.com/AmazonS3/latest/API/sig-v4-header-based-auth.html
 
@@ -26,7 +26,7 @@ package: vyzo/aws
   (string-append
    (symbol->string verb) "\n"
    uri "\n"
-   (canonical-query-string query) "\n"
+   (if query (canonical-query-string query) "") "\n"
    (canonical-headers headers) "\n"
    (signed-headers headers) "\n"
    (hex-encode hash)))
@@ -40,16 +40,29 @@ package: vyzo/aws
         (str (string-to-sign scope request-str ts)))
     (hmac-sha256 key (string->bytes str))))
 
+;; Calcuate the authorization header
+(def (aws4-auth scope request-str ts headers)
+  (let (sig (aws4-sign scope request-str ts))
+    (string-append "AWS4-HMAC-SHA256 "
+                   "Credential=" (aws-access-key) "/" scope "/aws4_request,"
+                   "SignedHeaders=" (signed-headers headers) ","
+                   "Signature=" (hex-encode sig))))
+
 ;;; internal
+(def (car-string<? a b)
+  (string<? (car a) (car b)))
+
 (def (canonical-repr val)
   (uri-encode
    (with-output-to-string []
      (cut display val))))
 
 (def (canonical-query-string query)
-  (let* ((query (map (lambda (q) (cons (car q) (canonical-repr (cdr q))))
+  (let* ((query (map (lambda (q)
+                       (cons (car q)
+                             (canonical-repr (cdr q))))
                      query))
-         (query (sort query (lambda (a b) (string<? (car a) (car b))))))
+         (query (sort query car-string<?)))
     (string-join
      (map (lambda (q) (string-append (car q) "=" (cdr q))) query)
      "&")))
@@ -57,12 +70,11 @@ package: vyzo/aws
 (def (canonical-headers headers)
   (let* ((headers (map (lambda (h)
                          (cons (string-downcase (car h))
-                               (canonical-repr (cdr h))))
+                               (cdr h)))
                        headers))
-         (headers (sort headers (lambda (a b) (string<? (car a) (car b))))))
-    (string-join
-     (map (lambda (h) (string-append (car h) ":" (cdr h))) headers)
-     "\n")))
+         (headers (sort headers car-string<?)))
+    (apply string-append
+      (map (lambda (h) (string-append (car h) ":" (cdr h) "\n")) headers))))
 
 (def (signed-headers headers)
   (string-join
@@ -87,10 +99,10 @@ package: vyzo/aws
        (hmac-sha256 date-region-svc-key
                     (@bytes "aws4_request"))))
     (else
-     (error "Bad request scope; expected date/region/service string"))))
+     (error "Bad request scope; expected date/region/service string" scope))))
 
 (def (string-to-sign scope req ts)
   (string-append "AWS4-HMAC-SHA256\n"
                  ts "\n"
-                 scope "\n"
+                 scope "/aws4_request" "\n"
                  (hex-encode (sha256 req))))
