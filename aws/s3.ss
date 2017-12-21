@@ -1,8 +1,6 @@
 ;;; -*- Gerbil -*-
 ;;; (C) vyzo
 ;;; AWS S3 client
-package: vyzo/aws
-
 (import "env"
         "sigv4"
         :std/net/request

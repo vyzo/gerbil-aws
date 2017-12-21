@@ -1,8 +1,6 @@
 ;;; -*- Gerbil -*-
 ;;; (C) vyzo
 ;;; AWS environment and parameters
-package: vyzo/aws
-
 (export #t)
 
 (def aws-access-key

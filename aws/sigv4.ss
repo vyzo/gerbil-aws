@@ -1,8 +1,6 @@
 ;;; -*- Gerbil -*-
 ;;; (C) vyzo
 ;;; AWS sigv4 request signatures
-package: vyzo/aws
-
 (import "env"
         :gerbil/gambit/bytes
         :std/srfi/13
