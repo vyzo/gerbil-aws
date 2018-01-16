@@ -28,7 +28,7 @@
              depgraph: depgraph
              optimize: #t
              static: #t
-             debug: 'env
+             debug: 'src
              prefix: "vyzo"
              build-spec)))
     (["tags"]
