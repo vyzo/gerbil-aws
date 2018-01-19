@@ -9,10 +9,11 @@ Gambit Licence: dual Apache/2 and LGPL/2.1.
 ## Installation
 
 ```
-$ git clone https://github.com/vyzo/gerbil-aws.git
-$ cd gerbil-aws
-$ ./build.ss
+gxpkg install github.com/vyzo/gerbil-aws
+
 ```
+
+Note: Your Gerbil must have been built with XML enabled.
 
 ## Usage
 
