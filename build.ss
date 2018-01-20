@@ -1,8 +1,7 @@
 #!/usr/bin/env gxi
 ;; -*- Gerbil -*-
 
-(import :std/make
-        (only-in :gerbil/tools/gxtags make-tags))
+(import :std/make)
 
 (def build-spec
   '("aws/env"
@@ -15,7 +14,7 @@
 (def (main . args)
   (match args
     (["meta"]
-     (write '("spec" "deps" "compile" "tags"))
+     (write '("spec" "deps" "compile"))
      (newline))
     (["spec"]
      (pretty-print build-spec))
@@ -31,12 +30,8 @@
              debug: 'src
              prefix: "vyzo"
              build-spec)))
-    (["tags"]
-     (make-tags ["aws"] "TAGS"))
     ([]
      (displayln "... make deps")
      (main "deps")
      (displayln "... compile")
-     (main "compile")
-     (displayln "... make tags")
-     (main "tags"))))
+     (main "compile"))))
