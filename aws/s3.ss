@@ -107,8 +107,8 @@
    (apply s3-request args)))
 
 (def (s3-parse-xml req)
-  (parse-xml (request-content req)
-             namespaces: '(("http://s3.amazonaws.com/doc/2006-03-01/" . "s3"))))
+  (read-xml (request-content req)
+            namespaces: '(("http://s3.amazonaws.com/doc/2006-03-01/" . "s3"))))
 
 (def (with-request-error req)
   (if (and (fx>= (request-status req) 200)
